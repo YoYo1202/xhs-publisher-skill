@@ -81,18 +81,12 @@ async def add_topics(ws, topics):
         print('话题按钮:', r['result']['result'].get('value'))
         await asyncio.sleep(1)
         await send(ws, 'Input.insertText', {'text': topic})
-        await asyncio.sleep(2)
-        r = await send(ws, 'Runtime.evaluate', {'expression': f'''
-            (function() {{
-                var spans = Array.from(document.querySelectorAll('span.name'));
-                var t = spans.find(s => s.innerText.trim() === '#{topic}');
-                if (!t) t = spans[0];
-                if (t) {{ t.click(); return 'clicked: ' + t.innerText.trim(); }}
-                return 'not found';
-            }})()
-        '''})
-        print(f'话题 {topic}:', r['result']['result'].get('value'))
         await asyncio.sleep(1)
+        # 按 Enter 确认话题关联（type + Enter）
+        await send(ws, 'Input.dispatchKeyEvent', {'type': 'keyDown', 'key': 'Enter', 'code': 'Enter'})
+        await send(ws, 'Input.dispatchKeyEvent', {'type': 'keyUp', 'key': 'Enter', 'code': 'Enter'})
+        await asyncio.sleep(1)
+        print(f'话题 {topic}: 已按 Enter 确认')
     print('话题添加完毕')
 
 
